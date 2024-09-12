@@ -1,60 +1,84 @@
-using System.Security.Cryptography.X509Certificates;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-public static class Arbol{
+class Arbol
+{
+    static void Main(){
+        List<string> catalogo = new List<string>();
+        IngresarTitulos(catalogo);
+        MostrarMenu(catalogo);
+    }
 
-    /// <summary>
-    /// Definición de un nodo
-    /// </summary>
-    public class Node{
-        public int Value;
-        public Node? left;
-        public Node? right;
+    static void IngresarTitulos(List<string> catalogo){
+        Console.WriteLine("Ingrese 10 títulos de revistas:");
 
-        /// <summary>
-        /// Constructor de un nodo
-        /// </summary>
-        /// <param name="valor">Requiere un valor entero</param>
-        public Node(int valor){
-            Value = valor;
-            left = null;
-            right = null;
+        for (int i = 0; i < 10; i++){
+            Console.Write($"Título {i + 1}: ");
+            string titulo = Console.ReadLine();
+            catalogo.Add(titulo);
         }
     }
 
-    public class ArbolBinario{
-        public Node? Raiz;
+    static void MostrarMenu(List<string> catalogo){
+        while (true){
+            Console.WriteLine("\nMenú:");
+            Console.WriteLine("1. Buscar un título (búsqueda iterativa)");
+            Console.WriteLine("2. Buscar un título (búsqueda recursiva)");
+            Console.WriteLine("3. Salir");
+            Console.Write("Seleccione una opción: ");
+            
+            string opcion = Console.ReadLine();
 
-        public void insertar(int nuevoValor){
-            // Si la raiz es nula, inserto el nuevo valor
-            if (Raiz == null)
-            {
-                Raiz = new Node(nuevoValor);
-            } else{
-                // si la raíz no es nula llamo a una función recurrente
-                insertarRecurrente(Raiz, nuevoValor);
-            } 
-        }
-
-        private void insertarRecurrente(Node nodo, int valor){
-            // Si el valor es menor que el valor de la raiz, vamos por la izq
-            if(valor<nodo.Value){
-                // si el nodo es nulo lo creamos
-                if(nodo.left == null){
-                    nodo.left = new Node(valor);
-                } else{
-                    insertarRecurrente(nodo.left, valor);
-                }
-            } else{
-                if(nodo.right == null){
-                    nodo.right = new Node(valor);
-                } else{
-                    insertarRecurrente(nodo.right, valor);
-                }
+            switch (opcion){
+                case "1":
+                    BuscarTituloIterativo(catalogo);
+                    break;
+                case "2":
+                    BuscarTituloRecursivo(catalogo);
+                    break;
+                case "3":
+                    return;
+                default:
+                    Console.WriteLine("Opción inválida. Intente nuevamente.");
+                    break;
             }
         }
-
     }
-    public static void Run(){
+
+    static void BuscarTituloIterativo(List<string> catalogo){
+        Console.Write("Ingrese el título a buscar: ");
+        string titulo = Console.ReadLine();
         
+        if (catalogo.Contains(titulo)){
+            Console.WriteLine("Título encontrado.");
+        }
+        else{
+            Console.WriteLine("Título no encontrado.");
+        }
+    }
+
+    static void BuscarTituloRecursivo(List<string> catalogo){
+        Console.Write("Ingrese el título a buscar: ");
+        string titulo = Console.ReadLine();
+        
+        bool encontrado = BuscarTituloRecursivoHelper(catalogo, titulo, 0);
+        
+        if (encontrado){
+            Console.WriteLine("Título encontrado.");
+        }
+        else{
+            Console.WriteLine("Título no encontrado.");
+        }
+    }
+
+    static bool BuscarTituloRecursivoHelper(List<string> catalogo, string titulo, int index){
+        if (index >= catalogo.Count){
+            return false;
+        }
+        if (catalogo[index] == titulo){
+            return true;
+        }
+        return BuscarTituloRecursivoHelper(catalogo, titulo, index + 1);
     }
 }
