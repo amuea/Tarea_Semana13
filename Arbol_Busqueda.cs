@@ -2,81 +2,162 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-class Arbol
+class Revista
 {
-    static void Main(string[] args)
-    {
-        List<string> catalogo = new List<string>();
-        Busqueda busqueda = new Busqueda();
-        
-        // Ingresar 10 títulos al catálogo
-        for (int i = 1; i <= 10; i++)
-        {
-            Console.Write($"Ingrese el título de la revista {i}: ");
-            catalogo.Add(Console.ReadLine());
-        }
+    public string Titulo;
+    public Revista Izquierda;
+    public Revista Derecha;
 
-        bool salir = false;
-        
-        while (!salir)
-        {
-            Console.WriteLine("\n--- Menú ---");
-            Console.WriteLine("1. Buscar título con búsqueda iterativa");
-            Console.WriteLine("2. Buscar título con búsqueda recursiva");
-            Console.WriteLine("3. Salir");
-            Console.Write("Seleccione una opción: ");
-            
-            int opcion = int.Parse(Console.ReadLine());
-            
-            switch (opcion)
-            {
-                case 1:
-                    Console.Write("Ingrese el título a buscar: ");
-                    string tituloIterativo = Console.ReadLine();
-                    bool encontradoIterativa = busqueda.BuscarIterativa(catalogo, tituloIterativo);
-                    Console.WriteLine(encontradoIterativa ? "Título encontrado" : "Título no encontrado");
-                    break;
-                    
-                case 2:
-                    Console.Write("Ingrese el título a buscar: ");
-                    string tituloRecursivo = Console.ReadLine();
-                    bool encontradoRecursiva = busqueda.BuscarRecursiva(catalogo, tituloRecursivo);
-                    Console.WriteLine(encontradoRecursiva ? "Título encontrado" : "Título no encontrado");
-                    break;
-                    
-                case 3:
-                    salir = true;
-                    break;
-                    
-                default:
-                    Console.WriteLine("Opción no válida, intente nuevamente.");
-                    break;
-            }
-        }
+    public Revista(string titulo)
+    {
+        Titulo = titulo;
+        Izquierda = null;
+        Derecha = null;
     }
 }
 
-
-public class Busqueda
+class CatalogoRevistas
 {
-    // Método para realizar una búsqueda iterativa
-    public bool BuscarIterativa(List<string> catalogo, string tituloBuscado)
+    public Revista Raiz;
+
+    public CatalogoRevistas()
     {
-        foreach (string titulo in catalogo)
-        {
-            if (titulo.Equals(tituloBuscado, StringComparison.OrdinalIgnoreCase))
-            {
-                return true; // Si el título es encontrado
-            }
-        }
-        return false; // Si no se encuentra el título
+        Raiz = null;
     }
 
-    // Método para realizar una búsqueda recursiva
-    public bool BuscarRecursiva(List<string> catalogo, string tituloBuscado, int index = 0)
+    // Método para agregar un título al árbol
+    public void Agregar(string titulo)
     {
-        if (index >= catalogo.Count) return false; // Si se llega al final sin encontrar
-        if (catalogo[index].Equals(tituloBuscado, StringComparison.OrdinalIgnoreCase)) return true; // Si se encuentra el título
-        return BuscarRecursiva(catalogo, tituloBuscado, index + 1); // Llamada recursiva al siguiente índice
+        Raiz = AgregarRecursivo(Raiz, titulo);
+    }
+
+    private Revista AgregarRecursivo(Revista nodo, string titulo)
+    {
+        if (nodo == null)
+        {
+            return new Revista(titulo);
+        }
+
+        if (string.Compare(titulo, nodo.Titulo) < 0)
+        {
+            nodo.Izquierda = AgregarRecursivo(nodo.Izquierda, titulo);
+        }
+        else if (string.Compare(titulo, nodo.Titulo) > 0)
+        {
+            nodo.Derecha = AgregarRecursivo(nodo.Derecha, titulo);
+        }
+
+        return nodo;
+    }
+
+    // Búsqueda recursiva
+    public bool BuscarRecursivo(string titulo)
+    {
+        return BuscarRecursivo(Raiz, titulo);
+    }
+
+    private bool BuscarRecursivo(Revista nodo, string titulo)
+    {
+        if (nodo == null)
+        {
+            return false;
+        }
+
+        if (titulo == nodo.Titulo)
+        {
+            return true;
+        }
+
+        if (string.Compare(titulo, nodo.Titulo) < 0)
+        {
+            return BuscarRecursivo(nodo.Izquierda, titulo);
+        }
+        else
+        {
+            return BuscarRecursivo(nodo.Derecha, titulo);
+        }
+    }
+
+    // Búsqueda iterativa
+    public bool BuscarIterativo(string titulo)
+    {
+        Revista actual = Raiz;
+
+        while (actual != null)
+        {
+            if (titulo == actual.Titulo)
+            {
+                return true;
+            }
+
+            if (string.Compare(titulo, actual.Titulo) < 0)
+            {
+                actual = actual.Izquierda;
+            }
+            else
+            {
+                actual = actual.Derecha;
+            }
+        }
+
+        return false;
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        CatalogoRevistas catalogo = new CatalogoRevistas();
+
+        // Agregar 10 títulos de revistas
+        catalogo.Agregar("National Geographic");
+        catalogo.Agregar("Forbes");
+        catalogo.Agregar("Time");
+        catalogo.Agregar("The Economist");
+        catalogo.Agregar("Popular Science");
+        catalogo.Agregar("Nature");
+        catalogo.Agregar("Scientific American");
+        catalogo.Agregar("New Yorker");
+        catalogo.Agregar("Wired");
+        catalogo.Agregar("Vogue");
+
+        while (true)
+        {
+            Console.WriteLine("\nMenú:");
+            Console.WriteLine("1. Buscar título (recursivo)");
+            Console.WriteLine("2. Buscar título (iterativo)");
+            Console.WriteLine("3. Salir");
+            Console.Write("Seleccione una opción: ");
+            int opcion = int.Parse(Console.ReadLine());
+
+            if (opcion == 3) break;
+
+            Console.Write("Ingrese el título a buscar: ");
+            string titulo = Console.ReadLine();
+
+            bool encontrado = false;
+            switch (opcion)
+            {
+                case 1:
+                    encontrado = catalogo.BuscarRecursivo(titulo);
+                    break;
+                case 2:
+                    encontrado = catalogo.BuscarIterativo(titulo);
+                    break;
+                default:
+                    Console.WriteLine("Opción inválida.");
+                    continue;
+            }
+
+            if (encontrado)
+            {
+                Console.WriteLine("Resultado de la búsqueda: Encontrado.");
+            }
+            else
+            {
+                Console.WriteLine("Resultado de la búsqueda: No encontrado.");
+            }
+        }
     }
 }
