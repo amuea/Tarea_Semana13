@@ -4,81 +4,79 @@ using System.Linq;
 
 class Arbol
 {
-    static void Main(){
+    static void Main(string[] args)
+    {
         List<string> catalogo = new List<string>();
-        IngresarTitulos(catalogo);
-        MostrarMenu(catalogo);
-    }
-
-    static void IngresarTitulos(List<string> catalogo){
-        Console.WriteLine("Ingrese 10 títulos de revistas:");
-
-        for (int i = 0; i < 10; i++){
-            Console.Write($"Título {i + 1}: ");
-            string titulo = Console.ReadLine();
-            catalogo.Add(titulo);
+        Busqueda busqueda = new Busqueda();
+        
+        // Ingresar 10 títulos al catálogo
+        for (int i = 1; i <= 10; i++)
+        {
+            Console.Write($"Ingrese el título de la revista {i}: ");
+            catalogo.Add(Console.ReadLine());
         }
-    }
 
-    static void MostrarMenu(List<string> catalogo){
-        while (true){
-            Console.WriteLine("\nMenú:");
-            Console.WriteLine("1. Buscar un título (búsqueda iterativa)");
-            Console.WriteLine("2. Buscar un título (búsqueda recursiva)");
+        bool salir = false;
+        
+        while (!salir)
+        {
+            Console.WriteLine("\n--- Menú ---");
+            Console.WriteLine("1. Buscar título con búsqueda iterativa");
+            Console.WriteLine("2. Buscar título con búsqueda recursiva");
             Console.WriteLine("3. Salir");
             Console.Write("Seleccione una opción: ");
             
-            string opcion = Console.ReadLine();
-
-            switch (opcion){
-                case "1":
-                    BuscarTituloIterativo(catalogo);
+            int opcion = int.Parse(Console.ReadLine());
+            
+            switch (opcion)
+            {
+                case 1:
+                    Console.Write("Ingrese el título a buscar: ");
+                    string tituloIterativo = Console.ReadLine();
+                    bool encontradoIterativa = busqueda.BuscarIterativa(catalogo, tituloIterativo);
+                    Console.WriteLine(encontradoIterativa ? "Título encontrado" : "Título no encontrado");
                     break;
-                case "2":
-                    BuscarTituloRecursivo(catalogo);
+                    
+                case 2:
+                    Console.Write("Ingrese el título a buscar: ");
+                    string tituloRecursivo = Console.ReadLine();
+                    bool encontradoRecursiva = busqueda.BuscarRecursiva(catalogo, tituloRecursivo);
+                    Console.WriteLine(encontradoRecursiva ? "Título encontrado" : "Título no encontrado");
                     break;
-                case "3":
-                    return;
+                    
+                case 3:
+                    salir = true;
+                    break;
+                    
                 default:
-                    Console.WriteLine("Opción inválida. Intente nuevamente.");
+                    Console.WriteLine("Opción no válida, intente nuevamente.");
                     break;
             }
         }
     }
+}
 
-    static void BuscarTituloIterativo(List<string> catalogo){
-        Console.Write("Ingrese el título a buscar: ");
-        string titulo = Console.ReadLine();
-        
-        if (catalogo.Contains(titulo)){
-            Console.WriteLine("Título encontrado.");
+
+public class Busqueda
+{
+    // Método para realizar una búsqueda iterativa
+    public bool BuscarIterativa(List<string> catalogo, string tituloBuscado)
+    {
+        foreach (string titulo in catalogo)
+        {
+            if (titulo.Equals(tituloBuscado, StringComparison.OrdinalIgnoreCase))
+            {
+                return true; // Si el título es encontrado
+            }
         }
-        else{
-            Console.WriteLine("Título no encontrado.");
-        }
+        return false; // Si no se encuentra el título
     }
 
-    static void BuscarTituloRecursivo(List<string> catalogo){
-        Console.Write("Ingrese el título a buscar: ");
-        string titulo = Console.ReadLine();
-        
-        bool encontrado = BuscarTituloRecursivoHelper(catalogo, titulo, 0);
-        
-        if (encontrado){
-            Console.WriteLine("Título encontrado.");
-        }
-        else{
-            Console.WriteLine("Título no encontrado.");
-        }
-    }
-
-    static bool BuscarTituloRecursivoHelper(List<string> catalogo, string titulo, int index){
-        if (index >= catalogo.Count){
-            return false;
-        }
-        if (catalogo[index] == titulo){
-            return true;
-        }
-        return BuscarTituloRecursivoHelper(catalogo, titulo, index + 1);
+    // Método para realizar una búsqueda recursiva
+    public bool BuscarRecursiva(List<string> catalogo, string tituloBuscado, int index = 0)
+    {
+        if (index >= catalogo.Count) return false; // Si se llega al final sin encontrar
+        if (catalogo[index].Equals(tituloBuscado, StringComparison.OrdinalIgnoreCase)) return true; // Si se encuentra el título
+        return BuscarRecursiva(catalogo, tituloBuscado, index + 1); // Llamada recursiva al siguiente índice
     }
 }
